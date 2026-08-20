@@ -1,75 +1,139 @@
-// =========================
+// ========================================
+// EESHWAR RAJ PORTFOLIO - JAVASCRIPT
+// ========================================
+
+
+// ================================
 // THEME TOGGLE
-// =========================
+// ================================
 
 const themeToggle = document.getElementById("theme-toggle");
 
-themeToggle.addEventListener("click", () => {
+if (themeToggle) {
 
-    document.body.classList.toggle("light-mode");
+    themeToggle.addEventListener("click", () => {
 
-    if (document.body.classList.contains("light-mode")) {
+        document.body.classList.toggle("light-mode");
+
+        const isLight =
+            document.body.classList.contains("light-mode");
+
+        themeToggle.textContent = isLight ? "☾" : "☀";
+
+        localStorage.setItem(
+            "theme",
+            isLight ? "light" : "dark"
+        );
+    });
+
+}
+
+
+// ================================
+// LOAD SAVED THEME
+// ================================
+
+const savedTheme = localStorage.getItem("theme");
+
+if (savedTheme === "light") {
+
+    document.body.classList.add("light-mode");
+
+    if (themeToggle) {
         themeToggle.textContent = "☾";
-    } else {
-        themeToggle.textContent = "☀";
     }
+}
 
-});
 
-
-// =========================
-// NAVBAR SCROLL EFFECT
-// =========================
+// ================================
+// NAVBAR SCROLL
+// ================================
 
 const navbar = document.querySelector(".navbar");
 
 window.addEventListener("scroll", () => {
 
+    if (!navbar) return;
+
     if (window.scrollY > 50) {
-        navbar.style.background = "rgba(5, 5, 5, 0.95)";
+
+        navbar.style.boxShadow =
+            "0 8px 30px rgba(0,0,0,0.18)";
+
     } else {
-        navbar.style.background = "rgba(5, 5, 5, 0.75)";
+
+        navbar.style.boxShadow = "none";
     }
 
 });
 
 
-// =========================
+// ================================
 // REVEAL ANIMATION
-// =========================
+// ================================
 
-const sections = document.querySelectorAll(".section");
+const reveals =
+    document.querySelectorAll(".reveal");
 
-const observer = new IntersectionObserver(
-    (entries) => {
+if (reveals.length > 0) {
 
-        entries.forEach((entry) => {
+    const observer = new IntersectionObserver(
+        (entries) => {
 
-            if (entry.isIntersecting) {
-                entry.target.classList.add("show");
-            }
+            entries.forEach((entry) => {
 
-        });
+                if (entry.isIntersecting) {
 
-    },
-    {
-        threshold: 0.15
+                    entry.target.classList.add("active");
+
+                    observer.unobserve(entry.target);
+                }
+
+            });
+
+        },
+        {
+            threshold: 0.15
+        }
+    );
+
+    reveals.forEach((element) => {
+
+        element.style.opacity = "0";
+
+        element.style.transform =
+            "translateY(25px)";
+
+        element.style.transition =
+            "opacity 0.7s ease, transform 0.7s ease";
+
+        observer.observe(element);
+    });
+}
+
+
+// ================================
+// REVEAL ACTIVE STATE
+// ================================
+
+const revealStyle = document.createElement("style");
+
+revealStyle.textContent = `
+    .reveal.active {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
     }
-);
+`;
 
-sections.forEach((section) => {
-    observer.observe(section);
-});
+document.head.appendChild(revealStyle);
 
 
-// =========================
-// CURRENT YEAR
-// =========================
+// ================================
+// FOOTER YEAR
+// ================================
 
-const year = new Date().getFullYear();
+const year = document.getElementById("year");
 
-const footerYear = document.querySelector("footer p");
-
-if (footerYear) {
-    footerYear.textContent = `© ${year} Eeshwar Raj`;
+if (year) {
+    year.textContent = new Date().getFullYear();
 }
