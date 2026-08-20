@@ -1,5 +1,5 @@
 // ========================================
-// EESHWAR RAJ PORTFOLIO - JAVASCRIPT
+// EESHWAR RAJ — PORTFOLIO JAVASCRIPT
 // ========================================
 
 
@@ -8,6 +8,16 @@
 // ================================
 
 const themeToggle = document.getElementById("theme-toggle");
+
+function updateThemeIcon() {
+
+    if (!themeToggle) return;
+
+    const isLight =
+        document.body.classList.contains("light-mode");
+
+    themeToggle.textContent = isLight ? "☾" : "☀";
+}
 
 if (themeToggle) {
 
@@ -18,35 +28,31 @@ if (themeToggle) {
         const isLight =
             document.body.classList.contains("light-mode");
 
-        themeToggle.textContent = isLight ? "☾" : "☀";
-
         localStorage.setItem(
             "theme",
             isLight ? "light" : "dark"
         );
-    });
 
+        updateThemeIcon();
+    });
 }
 
 
 // ================================
-// LOAD SAVED THEME
+// RESTORE SAVED THEME
 // ================================
 
 const savedTheme = localStorage.getItem("theme");
 
 if (savedTheme === "light") {
-
     document.body.classList.add("light-mode");
-
-    if (themeToggle) {
-        themeToggle.textContent = "☾";
-    }
 }
+
+updateThemeIcon();
 
 
 // ================================
-// NAVBAR SCROLL
+// NAVBAR SCROLL EFFECT
 // ================================
 
 const navbar = document.querySelector(".navbar");
@@ -55,12 +61,22 @@ window.addEventListener("scroll", () => {
 
     if (!navbar) return;
 
-    if (window.scrollY > 50) {
+    if (window.scrollY > 30) {
+
+        navbar.style.background =
+            document.body.classList.contains("light-mode")
+                ? "rgba(255,248,239,0.94)"
+                : "rgba(8,9,12,0.94)";
 
         navbar.style.boxShadow =
-            "0 8px 30px rgba(0,0,0,0.18)";
+            "0 10px 35px rgba(0,0,0,0.12)";
 
     } else {
+
+        navbar.style.background =
+            document.body.classList.contains("light-mode")
+                ? "rgba(255,248,239,0.78)"
+                : "rgba(8,9,12,0.72)";
 
         navbar.style.boxShadow = "none";
     }
@@ -69,71 +85,141 @@ window.addEventListener("scroll", () => {
 
 
 // ================================
-// REVEAL ANIMATION
+// SCROLL REVEAL
 // ================================
 
-const reveals =
-    document.querySelectorAll(".reveal");
+const revealElements = document.querySelectorAll(
+    ".section, .project, .journey-item, .contact-section"
+);
 
-if (reveals.length > 0) {
+revealElements.forEach((element) => {
 
-    const observer = new IntersectionObserver(
-        (entries) => {
+    element.style.opacity = "0";
 
-            entries.forEach((entry) => {
+    element.style.transform =
+        "translateY(35px)";
 
-                if (entry.isIntersecting) {
-
-                    entry.target.classList.add("active");
-
-                    observer.unobserve(entry.target);
-                }
-
-            });
-
-        },
-        {
-            threshold: 0.15
-        }
-    );
-
-    reveals.forEach((element) => {
-
-        element.style.opacity = "0";
-
-        element.style.transform =
-            "translateY(25px)";
-
-        element.style.transition =
-            "opacity 0.7s ease, transform 0.7s ease";
-
-        observer.observe(element);
-    });
-}
+    element.style.transition =
+        "opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)";
+});
 
 
-// ================================
-// REVEAL ACTIVE STATE
-// ================================
+const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
 
-const revealStyle = document.createElement("style");
+        entries.forEach((entry) => {
 
-revealStyle.textContent = `
-    .reveal.active {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
+            if (!entry.isIntersecting) return;
+
+            entry.target.style.opacity = "1";
+
+            entry.target.style.transform =
+                "translateY(0)";
+
+            observer.unobserve(entry.target);
+        });
+
+    },
+    {
+        threshold: 0.12
     }
-`;
+);
 
-document.head.appendChild(revealStyle);
+
+revealElements.forEach((element) => {
+    revealObserver.observe(element);
+});
 
 
 // ================================
-// FOOTER YEAR
+// PROJECT HOVER TILT
 // ================================
 
-const year = document.getElementById("year");
+const projects =
+    document.querySelectorAll(".project");
 
-if (year) {
-    year.textContent = new Date().getFullYear();
+projects.forEach((project) => {
+
+    project.addEventListener("mousemove", (event) => {
+
+        if (window.innerWidth < 900) return;
+
+        const rect =
+            project.getBoundingClientRect();
+
+        const x =
+            event.clientX - rect.left;
+
+        const y =
+            event.clientY - rect.top;
+
+        const rotateY =
+            ((x / rect.width) - 0.5) * 3;
+
+        const rotateX =
+            ((y / rect.height) - 0.5) * -3;
+
+        project.style.transform =
+            `translateY(-8px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+
+
+    project.addEventListener("mouseleave", () => {
+
+        project.style.transform =
+            "translateY(0) rotateX(0) rotateY(0)";
+    });
+
+});
+
+
+// ================================
+// CURRENT YEAR
+// ================================
+
+const yearElement =
+    document.getElementById("year");
+
+if (yearElement) {
+
+    yearElement.textContent =
+        new Date().getFullYear();
 }
+
+
+// ================================
+// SMOOTH NAVIGATION
+// ================================
+
+document.querySelectorAll(
+    '.nav-links a[href^="#"]'
+).forEach((link) => {
+
+    link.addEventListener("click", (event) => {
+
+        event.preventDefault();
+
+        const target =
+            document.querySelector(
+                link.getAttribute("href")
+            );
+
+        if (target) {
+
+            target.scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+
+    });
+
+});
+
+
+// ================================
+// CONSOLE MESSAGE
+// ================================
+
+console.log(
+    "Eeshwar Raj Portfolio — online."
+);
